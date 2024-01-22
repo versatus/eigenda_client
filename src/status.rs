@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use serde::{Serialize, Deserialize};
 use crate::info::BlobInfo;
 use crate::quorum::{
@@ -15,10 +17,11 @@ use crate::record::BlobSignatoryRecordHash;
 use crate::fee::BlobFee;
 
 // TODO: Implement custom Deserialize
-#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum BlobResult {
     Processing,
+    Finalized,
     Confirmed,
     Failed,
     Other(String)
@@ -33,7 +36,7 @@ impl Default for BlobResult {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BlobStatus {
     status: BlobResult,
-    info: BlobInfo
+    info: Option<BlobInfo>
 }
 
 impl BlobStatus {
@@ -41,84 +44,152 @@ impl BlobStatus {
         &self.status
     }
 
-    pub fn info(&self) -> &BlobInfo {
+    pub fn info(&self) -> &Option<BlobInfo> {
         &self.info
     }
     
-    pub fn blob_header(&self) -> &BlobHeader {
-        &self.info().blob_header()
+    pub fn blob_header(&self) -> Option<&BlobHeader> {
+        if let Some(info) = &self.info() {
+            return info.blob_header()
+        }
+        None
     }
 
-    pub fn blob_verification_proof(&self) -> &BlobVerificationProof {
-        &self.info().blob_verification_proof()
+    pub fn blob_verification_proof(&self) -> Option<&BlobVerificationProof> {
+        if let Some(info) = &self.info() {
+            return info.blob_verification_proof()
+        }
+
+        None
     }
 
-    pub fn commitment(&self) -> &BlobCommitment {
-        &self.blob_header().commitment()
+    pub fn commitment(&self) -> Option<&BlobCommitment> {
+        if let Some(header) = &self.blob_header() {
+            return Some(header.commitment())
+        }
+
+        None
     }
 
-    pub fn data_length(&self) -> usize {
-        self.blob_header().data_length()
+    pub fn data_length(&self) -> Option<usize> {
+        if let Some(header) = &self.blob_header() {
+            return Some(header.data_length())
+        }
+
+        None
     }
 
-    pub fn blob_quorum_params(&self) -> &Vec<BlobQuorumParams> {
-        &self.blob_header().blob_quorum_params()
+    pub fn blob_quorum_params(&self) -> Option<&Vec<BlobQuorumParams>> {
+        if let Some(header) = &self.blob_header() {
+            return Some(header.blob_quorum_params())
+        }
+
+        None
     }
 
-    pub fn batch_id(&self) -> u128 {
-        self.blob_verification_proof().batch_id()
+    pub fn batch_id(&self) -> Option<u128> {
+        if let Some(proof) = self.blob_verification_proof() {
+            return Some(proof.batch_id())
+        }
+        None
     }
 
-    pub fn blob_index(&self) -> u128 {
-        self.blob_verification_proof().blob_index()
+    pub fn blob_index(&self) -> Option<u128> {
+        if let Some(proof) = self.blob_verification_proof() {
+            return Some(proof.blob_index())
+        }
+        None
     }
 
-    pub fn batch_metadata(&self) -> &BatchMetadata {
-        self.blob_verification_proof().batch_metadata()
+    pub fn batch_metadata(&self) -> Option<&BatchMetadata> {
+        if let Some(proof) = &self.blob_verification_proof() {
+            return Some(proof.batch_metadata())
+        }
+        None
     }
 
-    pub fn inclusion_proof(&self) -> &BlobInclusionProof {
-        self.blob_verification_proof().inclusion_proof()
+    pub fn inclusion_proof(&self) -> Option<&BlobInclusionProof> {
+        if let Some(proof) = &self.blob_verification_proof() {
+            if let Some(p) = proof.inclusion_proof() {
+                return Some(p)
+            }
+        }
+        None
     }
 
-    pub fn quorum_indexes(&self) -> &BlobQuorumIndexes {
-        self.blob_verification_proof().quorum_indexes()
+    pub fn quorum_indexes(&self) -> Option<&BlobQuorumIndexes> {
+        if let Some(proof) = &self.blob_verification_proof() {
+            return Some(proof.quorum_indexes())
+        }
+        None
     }
 
-    pub fn batch_header(&self) -> &BatchHeader {
-        self.batch_metadata().batch_header()
+    pub fn batch_header(&self) -> Option<&BatchHeader> {
+        if let Some(metadata) = &self.batch_metadata() {
+            return Some(metadata.batch_header())
+        }
+        None
     }
 
-    pub fn signatory_record_hash(&self) -> &BlobSignatoryRecordHash {
-        self.batch_metadata().signatory_record_hash()
+    pub fn signatory_record_hash(&self) -> Option<&BlobSignatoryRecordHash> {
+        if let Some(metadata) = self.batch_metadata() {
+            return Some(metadata.signatory_record_hash())
+        }
+        None
     }
 
-    pub fn fee(&self) -> &BlobFee {
-        self.batch_metadata().fee()
+    pub fn fee(&self) -> Option<&BlobFee> {
+        if let Some(metadata) = &self.batch_metadata() {
+            return Some(metadata.fee())
+        }
+
+        None
     }
 
-    pub fn confirmation_block_number(&self) -> u128 {
-        self.batch_metadata().confirmation_block_number()
+    pub fn confirmation_block_number(&self) -> Option<u128> {
+        if let Some(metadata) = self.batch_metadata() {
+            return Some(metadata.confirmation_block_number())
+        }
+
+        None
     }
 
-    pub fn batch_header_hash(&self) -> &BatchHeaderHash {
-        self.batch_metadata().batch_header_hash()
+    pub fn batch_header_hash(&self) -> Option<&BatchHeaderHash> {
+        if let Some(metadata) = &self.batch_metadata() {
+            return Some(metadata.batch_header_hash())
+        }
+
+        None
     }
     
-    pub fn batch_root(&self) -> &BlobBatchRoot {
-        self.batch_header().batch_root()
+    pub fn batch_root(&self) -> Option<&BlobBatchRoot> {
+        if let Some(header) = &self.batch_header() {
+            return Some(header.batch_root())
+        }
+
+        None
     }
 
-    pub fn quorum_numbers(&self) -> &BlobQuorumNumbers {
-        self.batch_header().quorum_numbers()
+    pub fn quorum_numbers(&self) -> Option<&BlobQuorumNumbers> {
+        if let Some(header) = &self.batch_header() {
+            return Some(header.quorum_numbers())
+        }
+        None
     }
 
-    pub fn quorum_signed_percentages(&self) -> &BlobQuorumSignedPercentages {
-        self.batch_header().quorum_signed_percentages()
+    pub fn quorum_signed_percentages(&self) -> Option<&BlobQuorumSignedPercentages> {
+        if let Some(header) = &self.batch_header() {
+            return Some(header.quorum_signed_percentages())
+        }
+
+        None
     }
 
-    pub fn reference_block_number(&self) -> u128 {
-        self.batch_header().reference_block_number()
+    pub fn reference_block_number(&self) -> Option<u128> {
+        if let Some(header) = self.batch_header() {
+            return Some(header.reference_block_number())
+        }
+        None
     }
 }
 
@@ -138,6 +209,12 @@ impl From<String> for BlobStatus {
         } else {
             return BlobStatus::default()
         }
+    } }
+
+impl FromStr for BlobStatus {
+    type Err = serde_json::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        serde_json::from_str(s)
     }
 }
 

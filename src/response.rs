@@ -1,7 +1,7 @@
 use crate::status::BlobResult;
 use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, PartialOrd, Ord)]
 pub struct BlobResponse {
     result: BlobResult,
     #[serde(rename = "requestId")]
@@ -28,7 +28,6 @@ impl From<String> for BlobResponse {
     fn from(value: String) -> Self {
         if let Some(start_index) = value.find('{') {
             let json_str = &value[start_index..];
-            println!("{}", &json_str);
 
             let blob_response: Result<BlobResponse, serde_json::Error> = serde_json::from_str(json_str);
 
@@ -37,7 +36,7 @@ impl From<String> for BlobResponse {
                     return response
                 }
                 Err(err) => {
-                    println!("{}", &err);
+                    log::error!("{}", &err);
                     return BlobResponse::default() 
                 }
             }

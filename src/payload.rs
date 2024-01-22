@@ -9,13 +9,12 @@ pub struct EigenDaBlobPayload {
 }
 
 impl EigenDaBlobPayload {
-    pub(crate) fn new(
-        data: &str,
+    pub fn new(
+        data: String,
         quorum_id: &u32,
         adversary_threshold: &u32, 
         quorum_threshold: &u32,
     ) -> Self {
-        let data = base64::encode(data);
         EigenDaBlobPayload { 
             data,
             quorum_id: *quorum_id,

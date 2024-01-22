@@ -15,7 +15,7 @@ pub struct BlobQuorumParams {
     adversary_threshold_percentage: usize,
     quorum_threshold_percentage: usize,
     quantization_param: usize,
-    encoded_length: String,
+    encoded_length: Option<String>,
 }
 
 impl BlobQuorumParams {
@@ -31,7 +31,7 @@ impl BlobQuorumParams {
         self.quantization_param
     }
 
-    pub fn encoded_length(&self) -> String {
+    pub fn encoded_length(&self) -> Option<String> {
         self.encoded_length.clone()
     }
 }

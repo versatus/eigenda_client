@@ -64,8 +64,7 @@ fn main() -> Result<(), Error> {
     // somewhere and poll for the actual blob in a separate thread as this
     // blocks
     let batch_header_hash = blob_status.batch_header_hash();
-        let blob = client.retrieve_blob(batch_header_hash);
-        println!("{:?}", blob);
+        let blob = client.retrieve_blob(batch_header_hash, blob_index);
     }
 }
 ```

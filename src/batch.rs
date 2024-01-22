@@ -1,12 +1,24 @@
 use serde::{Serialize, Deserialize};
 use crate::quorum::{BlobQuorumNumbers, BlobQuorumSignedPercentages};
 
-#[derive(Clone, Debug, Serialize, Deserialize, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct BatchHeaderHash(String);
+
+impl BatchHeaderHash {
+    pub fn new(value: String) -> Self {
+        Self(value)
+    }
+}
 
 impl ToString for BatchHeaderHash {
     fn to_string(&self) -> String {
         self.0.clone()
+    }
+}
+
+impl From<String> for BatchHeaderHash {
+    fn from(value: String) -> Self {
+        BatchHeaderHash::new(value)
     }
 }
 

@@ -22,17 +22,22 @@ pub mod client;
 pub mod payload;
 pub mod blob;
 
+pub use client::*;
+
 impl LruCache for LinkedHashSet<BlobResponse> {
     type Value = BlobResponse;
 
     fn cache(&mut self, item: &Self::Value) {
         self.insert(item.clone());
     }
+
+    fn get(&self, key: &Self::Item) -> Option<&Self::Value> {
+        self.get(&key)
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::blob::{EncodedBlob, DecodedBlob};
     use crate::client::{EigenDaGrpcClientBuilder, EigenDaGrpcClient};
     use crate::status::BlobResult;
@@ -42,8 +47,8 @@ mod tests {
     #[test]
     fn test_disperse_get_status_and_retrieve_blob() {
 
-        let mut client = create_client(40, 60); 
-        let arbitrary_data = "ArbitraryData";
+        let client = create_client(40, 60); 
+        let arbitrary_data = base64::encode("ArbitraryData");
         
         let blob_response = client.disperse_blob(arbitrary_data, &0).unwrap();
         let mut blob_status = client.get_blob_status(&blob_response.request_id()).unwrap(); 
@@ -52,9 +57,10 @@ mod tests {
             blob_status = client.get_blob_status(&blob_response.request_id()).unwrap();
         }
 
-        let batch_header_hash = blob_status.batch_header_hash();
+        let batch_header_hash = blob_status.batch_header_hash().unwrap();
+        let blob_index = blob_status.blob_index().unwrap();
 
-        let blob = client.retrieve_blob(batch_header_hash).unwrap();
+        let blob = client.retrieve_blob(batch_header_hash, blob_index).unwrap();
 
         let blob = EncodedBlob::from_str(&blob).unwrap();
 
@@ -62,14 +68,12 @@ mod tests {
         println!("{}", decoded_blob.len());
     }
 
-    fn create_client(adversary_threshold: u32, quorum_threshold: u32) -> EigenDaGrpcClient<LinkedHashSet<BlobResponse>> 
-    {
-        EigenDaGrpcClientBuilder::new()
-            .proto_path("./eigenda/api/proto/disperser/disperser.proto")
-            .server_address("disperser-goerli.eigenda.xyz:443")
+    fn create_client(adversary_threshold: u32, quorum_threshold: u32) -> EigenDaGrpcClient {
+        EigenDaGrpcClientBuilder::default()
+            .proto_path("./eigenda/api/proto/disperser/disperser.proto".to_string())
+            .server_address("disperser-goerli.eigenda.xyz:443".to_string())
             .adversary_threshold(adversary_threshold)
             .quorum_threshold(quorum_threshold)
-            .blob_cache(LinkedHashSet::new())
             .build()
             .unwrap()
     } 
