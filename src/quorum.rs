@@ -14,7 +14,7 @@ impl ToString for BlobQuorumIndexes {
 pub struct BlobQuorumParams {
     adversary_threshold_percentage: usize,
     quorum_threshold_percentage: usize,
-    quantization_param: usize,
+    quantization_param: Option<usize>,
     encoded_length: Option<String>,
 }
 
@@ -27,8 +27,8 @@ impl BlobQuorumParams {
         self.quorum_threshold_percentage
     }
 
-    pub fn quantization_param(&self) -> usize {
-        self.quantization_param
+    pub fn quantization_param(&self) -> Option<usize> {
+        self.quantization_param.clone()
     }
 
     pub fn encoded_length(&self) -> Option<String> {
