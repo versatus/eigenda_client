@@ -26,37 +26,28 @@ impl EigenDaBlobPayload {
 
 impl From<EigenDaBlobPayload> for String {
     fn from(value: EigenDaBlobPayload) -> Self {
-        let mut json_payload = String::new();
-        json_payload.push_str(r#"{"data":"#);
-        json_payload.push_str(&format!(r#""{}""#, &value.data));
-        json_payload.push_str(r#", "security_params":[{"quorum_id":"#);
-        json_payload.push_str(&value.quorum_id.to_string());
-        json_payload.push_str(r#","adversary_threshold":"#);
-        json_payload.push_str(&value.adversary_threshold.to_string());
-        json_payload.push_str(r#","quorum_threshold":"#);
-        json_payload.push_str(&value.quorum_threshold.to_string());
-        json_payload.push_str(r#"}]}"#);
-
-        json_payload
-        
+        let payload = serde_json::json!({
+            "data": value.data,
+            "security_params": [{
+                "quorum_id": value.quorum_id.to_string(),
+                "adversary_threshold": value.adversary_threshold.to_string(),
+                "quorum_threshold": value.quorum_threshold.to_string()
+            }]
+        });
+        payload.to_string()
     }
 }
 
 impl From<&EigenDaBlobPayload> for String {
     fn from(value: &EigenDaBlobPayload) -> Self {
-        let mut json_payload = String::new();
-
-        json_payload.push_str(r#"{"data":"#);
-        json_payload.push_str(&format!(r#""{}""#, &value.data));
-        json_payload.push_str(r#", "security_params":[{"quorum_id":"#);
-        json_payload.push_str(&value.quorum_id.to_string());
-        json_payload.push_str(r#"","adversary_threshold":"#);
-        json_payload.push_str(&value.adversary_threshold.to_string());
-        json_payload.push_str(r#","quorum_threshold":"#);
-        json_payload.push_str(&value.quorum_threshold.to_string());
-        json_payload.push_str(r#"}]}"#);
-
-        json_payload
-        
+        let payload = serde_json::json!({
+            "data": value.data,
+            "security_params": [{
+                "quorum_id": value.quorum_id.to_string(),
+                "adversary_threshold": value.adversary_threshold.to_string(),
+                "quorum_threshold": value.quorum_threshold.to_string()
+            }]
+        });
+        payload.to_string()
     }
 }
