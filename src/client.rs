@@ -5,6 +5,7 @@ use crate::status::BlobStatus;
 use crate::batch::BatchHeaderHash;
 use crate::grpcurl_command;
 use std::str::FromStr;
+use regex::Regex;
 
 #[derive(Builder, Clone, Debug)]
 pub struct EigenDaGrpcClient {
@@ -51,15 +52,13 @@ impl EigenDaGrpcClient {
     }
 
     pub fn get_blob_status(&self, request_id: &str) -> Result<BlobStatus, std::io::Error> {
-        let mut payload = String::new();
-        payload.push_str(r#"{"#);
-        payload.push_str(r#""request_id":"#);
-        payload.push_str(&format!(r#""{}""#, request_id));
-        payload.push_str(r#"}"#);
+        let payload = serde_json::json!({
+            "request_id": request_id
+        });
 
         let output = grpcurl_command!(
             "-proto", &self.proto_path,
-            "-d", &payload,
+            "-d", &payload.to_string(),
             &self.server_address,
             "disperser.Disperser/GetBlobStatus"
         )?;
@@ -68,8 +67,9 @@ impl EigenDaGrpcClient {
             let response = String::from_utf8(output.stdout).map_err(|err| {
                 std::io::Error::new(std::io::ErrorKind::Other, err.to_string())
             })?;
-
-            let res = BlobStatus::from_str(&response);
+            let re = Regex::new(r"(\\n|\\t|\n\t|\s\s+)").unwrap(); 
+            let clean_response = re.replace_all(&response, " ").to_string();
+            let res = BlobStatus::from_str(&clean_response);
             if let Err(e) = &res {
                 dbg!(response);
                 log::error!("{}", e);
@@ -84,17 +84,14 @@ impl EigenDaGrpcClient {
     }
 
     pub fn retrieve_blob(&self, batch_header_hash: &BatchHeaderHash, blob_index: u128) -> Result<String, std::io::Error> {
-        let mut payload = String::new();
-        payload.push_str(r#"{"#);
-        payload.push_str(r#""batch_header_hash":"#);
-        payload.push_str(&format!(r#""{}""#, batch_header_hash.to_string()));
-        payload.push_str(r#", "blob_index":"#);
-        payload.push_str(&format!(r#""{}""#, blob_index));
-        payload.push_str(r#"}"#);
+        let payload = serde_json::json!({
+            "batch_header_hash": batch_header_hash.to_string(),
+            "blob_index": blob_index.to_string()
+        });
 
         let output = grpcurl_command!(
             "-proto", &self.proto_path,
-            "-d", &payload,
+            "-d", &payload.to_string(),
             &self.server_address,
             "disperser.Disperser/RetrieveBlob"
         )?;
