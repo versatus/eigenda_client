@@ -21,7 +21,6 @@ ritelinked = "0.3.2"
 serde = { version = "1.0.192", features=["derive"] }
 serde_json = "1.0.108"
 derive_builder = "0.12.0"
-tonic = "0.10.2"
 log = "0.4.20"
 clap = { version = "4.4.11", features=[ "derive", "cargo", "env", "wrap_help", "string" ] }
 regex = "1.1.3"
