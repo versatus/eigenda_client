@@ -11,22 +11,17 @@ use regex::Regex;
 pub struct EigenDaGrpcClient {
     proto_path: String,
     server_address: String,
-    adversary_threshold: u32,
-    quorum_threshold: u32,
 }
 
 impl EigenDaGrpcClient {
-    fn get_payload(&self, encoded_data: String, quorum_id: &u32) -> EigenDaBlobPayload {
+    fn get_payload(&self, encoded_data: String) -> EigenDaBlobPayload {
         EigenDaBlobPayload::new(  
             encoded_data,
-            quorum_id,
-            &self.adversary_threshold,
-            &self.quorum_threshold,
         ) 
     }
 
-    pub fn disperse_blob(&self, encoded_data: String, quorum_id: &u32) -> Result<BlobResponse, std::io::Error> {
-        let payload: String = self.get_payload(encoded_data, quorum_id).into();
+    pub fn disperse_blob(&self, encoded_data: String) -> Result<BlobResponse, std::io::Error> {
+        let payload: String = self.get_payload(encoded_data).into();
 
         let output = grpcurl_command!(
             "-proto", &self.proto_path,

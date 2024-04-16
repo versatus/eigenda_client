@@ -46,8 +46,7 @@ mod tests {
     
     #[test]
     fn test_disperse_get_status_and_retrieve_blob() {
-
-        let client = create_client(40, 60); 
+        let client = create_client(); 
         let arbitrary_data = base64::encode("ArbitraryData");
         
         let blob_response = client.disperse_blob(arbitrary_data, &0).unwrap();
@@ -68,12 +67,10 @@ mod tests {
         println!("{}", decoded_blob.len());
     }
 
-    fn create_client(adversary_threshold: u32, quorum_threshold: u32) -> EigenDaGrpcClient {
+    fn create_client() -> EigenDaGrpcClient {
         EigenDaGrpcClientBuilder::default()
             .proto_path("./eigenda/api/proto/disperser/disperser.proto".to_string())
             .server_address("disperser-goerli.eigenda.xyz:443".to_string())
-            .adversary_threshold(adversary_threshold)
-            .quorum_threshold(quorum_threshold)
             .build()
             .unwrap()
     } 
