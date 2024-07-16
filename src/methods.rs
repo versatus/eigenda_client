@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub enum EigenDaGrpcMethod {
@@ -11,11 +11,10 @@ impl ToString for EigenDaGrpcMethod {
         match self {
             EigenDaGrpcMethod::DisperseBlob => {
                 return "disperser.Disperser/DisperseBlob".to_string()
-            },
+            }
             EigenDaGrpcMethod::GetBlobStatus => {
                 return "disperser.Disperser/GetBlobStatus".to_string()
             }
         }
     }
 }
-

@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct BlobSignatoryRecordHash(String);
@@ -8,4 +8,3 @@ impl ToString for BlobSignatoryRecordHash {
         self.0.clone()
     }
 }
-

@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
 use crate::commitment::BlobCommitment;
 use crate::quorum::BlobQuorumParams;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -11,7 +11,7 @@ pub struct BlobHeader {
 }
 
 impl BlobHeader {
-    pub fn commitment(&self) -> & BlobCommitment {
+    pub fn commitment(&self) -> &BlobCommitment {
         &self.commitment
     }
 
@@ -26,10 +26,10 @@ impl BlobHeader {
 
 impl Default for BlobHeader {
     fn default() -> Self {
-        BlobHeader { 
+        BlobHeader {
             commitment: Default::default(),
             data_length: Default::default(),
-            blob_quorum_params: Default::default()
+            blob_quorum_params: Default::default(),
         }
     }
 }

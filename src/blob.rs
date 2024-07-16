@@ -1,8 +1,8 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EncodedBlob {
-    data: String
+    data: String,
 }
 
 impl EncodedBlob {
@@ -17,16 +17,14 @@ impl EncodedBlob {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DecodedBlob {
-    data: Vec<u8>
+    data: Vec<u8>,
 }
 
 impl DecodedBlob {
     pub fn from_encoded(blob: EncodedBlob) -> Result<Self, base64::DecodeError> {
         let decoded = base64::decode(&blob.data())?;
 
-        Ok(Self {
-            data: decoded
-        })
+        Ok(Self { data: decoded })
     }
 
     pub fn data(&self) -> Vec<u8> {
