@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -9,4 +9,3 @@ impl ToString for BlobCommitment {
         self.0.clone()
     }
 }
-

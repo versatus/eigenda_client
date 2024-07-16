@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
 use crate::batch::{BatchHeader, BatchHeaderHash};
-use crate::record::BlobSignatoryRecordHash;
 use crate::fee::BlobFee;
+use crate::record::BlobSignatoryRecordHash;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -10,7 +10,7 @@ pub struct BatchMetadata {
     signatory_record_hash: BlobSignatoryRecordHash,
     fee: BlobFee,
     confirmation_block_number: u128,
-    batch_header_hash: BatchHeaderHash 
+    batch_header_hash: BatchHeaderHash,
 }
 
 impl BatchMetadata {
@@ -34,4 +34,3 @@ impl BatchMetadata {
         &self.batch_header_hash
     }
 }
-

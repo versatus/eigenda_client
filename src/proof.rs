@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize};
 use crate::meta::BatchMetadata;
 use crate::quorum::BlobQuorumIndexes;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -8,8 +8,8 @@ pub struct BlobVerificationProof {
     batch_id: u128,
     blob_index: Option<u128>,
     batch_metadata: BatchMetadata,
-    inclusion_proof: Option<BlobInclusionProof>, 
-    quorum_indexes: BlobQuorumIndexes, 
+    inclusion_proof: Option<BlobInclusionProof>,
+    quorum_indexes: BlobQuorumIndexes,
 }
 
 impl BlobVerificationProof {
@@ -19,7 +19,7 @@ impl BlobVerificationProof {
 
     pub fn blob_index(&self) -> u128 {
         if let Some(index) = self.blob_index {
-            return index
+            return index;
         }
         0
     }

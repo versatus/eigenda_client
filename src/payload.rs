@@ -1,17 +1,13 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Serialize,  Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EigenDaBlobPayload {
     data: String,
 }
 
 impl EigenDaBlobPayload {
-    pub fn new(
-        data: String,
-    ) -> Self {
-        EigenDaBlobPayload { 
-            data
-        }
+    pub fn new(data: String) -> Self {
+        EigenDaBlobPayload { data }
     }
 }
 

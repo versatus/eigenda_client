@@ -1,11 +1,11 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct BlobQuorumIndexes(String);
 
 impl ToString for BlobQuorumIndexes {
     fn to_string(&self) -> String {
-       self.0.clone() 
+        self.0.clone()
     }
 }
 
@@ -53,4 +53,3 @@ impl ToString for BlobQuorumSignedPercentages {
         self.0.clone()
     }
 }
-

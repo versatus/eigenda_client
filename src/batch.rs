@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use crate::quorum::{BlobQuorumNumbers, BlobQuorumSignedPercentages};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct BatchHeaderHash(String);
@@ -28,7 +28,7 @@ pub struct BatchHeader {
     batch_root: BlobBatchRoot,
     quorum_numbers: BlobQuorumNumbers,
     quorum_signed_percentages: BlobQuorumSignedPercentages,
-    reference_block_number: u128
+    reference_block_number: u128,
 }
 
 impl BatchHeader {

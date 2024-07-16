@@ -1,26 +1,26 @@
-use ritelinked::LinkedHashSet;
 use crate::cache::LruCache;
 use crate::response::BlobResponse;
+use ritelinked::LinkedHashSet;
 
-pub mod macros;
-pub mod cache;
-pub mod methods;
-pub mod status;
-pub mod error;
-pub mod result;
-pub mod response;
-pub mod info;
-pub mod header;
-pub mod proof;
-pub mod commitment;
-pub mod quorum;
-pub mod meta;
 pub mod batch;
-pub mod fee;
-pub mod record;
-pub mod client;
-pub mod payload;
 pub mod blob;
+pub mod cache;
+pub mod client;
+pub mod commitment;
+pub mod error;
+pub mod fee;
+pub mod header;
+pub mod info;
+pub mod macros;
+pub mod meta;
+pub mod methods;
+pub mod payload;
+pub mod proof;
+pub mod quorum;
+pub mod record;
+pub mod response;
+pub mod result;
+pub mod status;
 
 pub use client::*;
 
@@ -38,19 +38,19 @@ impl LruCache for LinkedHashSet<BlobResponse> {
 
 #[cfg(test)]
 mod tests {
-    use crate::blob::{EncodedBlob, DecodedBlob};
-    use crate::client::{EigenDaGrpcClientBuilder, EigenDaGrpcClient};
+    use crate::blob::{DecodedBlob, EncodedBlob};
+    use crate::client::{EigenDaGrpcClient, EigenDaGrpcClientBuilder};
     use crate::status::BlobResult;
     use std::thread;
     use std::time::Duration;
-    
+
     #[test]
     fn test_disperse_get_status_and_retrieve_blob() {
-        let client = create_client(); 
+        let client = create_client();
         let arbitrary_data = base64::encode("ArbitraryData");
-        
-        let blob_response = client.disperse_blob(arbitrary_data, &0).unwrap();
-        let mut blob_status = client.get_blob_status(&blob_response.request_id()).unwrap(); 
+
+        let blob_response = client.disperse_blob(arbitrary_data).unwrap();
+        let mut blob_status = client.get_blob_status(&blob_response.request_id()).unwrap();
         while blob_status.status() != &BlobResult::Confirmed {
             thread::sleep(Duration::from_secs(30));
             blob_status = client.get_blob_status(&blob_response.request_id()).unwrap();
@@ -73,5 +73,5 @@ mod tests {
             .server_address("disperser-goerli.eigenda.xyz:443".to_string())
             .build()
             .unwrap()
-    } 
+    }
 }

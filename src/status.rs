@@ -1,20 +1,17 @@
 use std::str::FromStr;
 
-use serde::{Serialize, Deserialize};
-use crate::info::BlobInfo;
-use crate::quorum::{
-    BlobQuorumParams,
-    BlobQuorumIndexes,
-    BlobQuorumNumbers,
-    BlobQuorumSignedPercentages
-};
-use crate::batch::{BlobBatchRoot, BatchHeader, BatchHeaderHash};
-use crate::header::BlobHeader;
-use crate::proof::{BlobInclusionProof, BlobVerificationProof};
+use crate::batch::{BatchHeader, BatchHeaderHash, BlobBatchRoot};
 use crate::commitment::BlobCommitment;
-use crate::meta::BatchMetadata;
-use crate::record::BlobSignatoryRecordHash;
 use crate::fee::BlobFee;
+use crate::header::BlobHeader;
+use crate::info::BlobInfo;
+use crate::meta::BatchMetadata;
+use crate::proof::{BlobInclusionProof, BlobVerificationProof};
+use crate::quorum::{
+    BlobQuorumIndexes, BlobQuorumNumbers, BlobQuorumParams, BlobQuorumSignedPercentages,
+};
+use crate::record::BlobSignatoryRecordHash;
+use serde::{Deserialize, Serialize};
 
 // TODO: Implement custom Deserialize
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, PartialOrd, Ord)]
@@ -24,7 +21,7 @@ pub enum BlobResult {
     Finalized,
     Confirmed,
     Failed,
-    Other(String)
+    Other(String),
 }
 
 impl Default for BlobResult {
@@ -36,7 +33,7 @@ impl Default for BlobResult {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BlobStatus {
     status: BlobResult,
-    info: Option<BlobInfo>
+    info: Option<BlobInfo>,
 }
 
 impl BlobStatus {
@@ -47,17 +44,17 @@ impl BlobStatus {
     pub fn info(&self) -> &Option<BlobInfo> {
         &self.info
     }
-    
+
     pub fn blob_header(&self) -> Option<&BlobHeader> {
         if let Some(info) = &self.info() {
-            return info.blob_header()
+            return info.blob_header();
         }
         None
     }
 
     pub fn blob_verification_proof(&self) -> Option<&BlobVerificationProof> {
         if let Some(info) = &self.info() {
-            return info.blob_verification_proof()
+            return info.blob_verification_proof();
         }
 
         None
@@ -65,7 +62,7 @@ impl BlobStatus {
 
     pub fn commitment(&self) -> Option<&BlobCommitment> {
         if let Some(header) = &self.blob_header() {
-            return Some(header.commitment())
+            return Some(header.commitment());
         }
 
         None
@@ -73,7 +70,7 @@ impl BlobStatus {
 
     pub fn data_length(&self) -> Option<usize> {
         if let Some(header) = &self.blob_header() {
-            return Some(header.data_length())
+            return Some(header.data_length());
         }
 
         None
@@ -81,7 +78,7 @@ impl BlobStatus {
 
     pub fn blob_quorum_params(&self) -> Option<&Vec<BlobQuorumParams>> {
         if let Some(header) = &self.blob_header() {
-            return Some(header.blob_quorum_params())
+            return Some(header.blob_quorum_params());
         }
 
         None
@@ -89,21 +86,21 @@ impl BlobStatus {
 
     pub fn batch_id(&self) -> Option<u128> {
         if let Some(proof) = self.blob_verification_proof() {
-            return Some(proof.batch_id())
+            return Some(proof.batch_id());
         }
         None
     }
 
     pub fn blob_index(&self) -> Option<u128> {
         if let Some(proof) = self.blob_verification_proof() {
-            return Some(proof.blob_index())
+            return Some(proof.blob_index());
         }
         None
     }
 
     pub fn batch_metadata(&self) -> Option<&BatchMetadata> {
         if let Some(proof) = &self.blob_verification_proof() {
-            return Some(proof.batch_metadata())
+            return Some(proof.batch_metadata());
         }
         None
     }
@@ -111,7 +108,7 @@ impl BlobStatus {
     pub fn inclusion_proof(&self) -> Option<&BlobInclusionProof> {
         if let Some(proof) = &self.blob_verification_proof() {
             if let Some(p) = proof.inclusion_proof() {
-                return Some(p)
+                return Some(p);
             }
         }
         None
@@ -119,28 +116,28 @@ impl BlobStatus {
 
     pub fn quorum_indexes(&self) -> Option<&BlobQuorumIndexes> {
         if let Some(proof) = &self.blob_verification_proof() {
-            return Some(proof.quorum_indexes())
+            return Some(proof.quorum_indexes());
         }
         None
     }
 
     pub fn batch_header(&self) -> Option<&BatchHeader> {
         if let Some(metadata) = &self.batch_metadata() {
-            return Some(metadata.batch_header())
+            return Some(metadata.batch_header());
         }
         None
     }
 
     pub fn signatory_record_hash(&self) -> Option<&BlobSignatoryRecordHash> {
         if let Some(metadata) = self.batch_metadata() {
-            return Some(metadata.signatory_record_hash())
+            return Some(metadata.signatory_record_hash());
         }
         None
     }
 
     pub fn fee(&self) -> Option<&BlobFee> {
         if let Some(metadata) = &self.batch_metadata() {
-            return Some(metadata.fee())
+            return Some(metadata.fee());
         }
 
         None
@@ -148,7 +145,7 @@ impl BlobStatus {
 
     pub fn confirmation_block_number(&self) -> Option<u128> {
         if let Some(metadata) = self.batch_metadata() {
-            return Some(metadata.confirmation_block_number())
+            return Some(metadata.confirmation_block_number());
         }
 
         None
@@ -156,15 +153,15 @@ impl BlobStatus {
 
     pub fn batch_header_hash(&self) -> Option<&BatchHeaderHash> {
         if let Some(metadata) = &self.batch_metadata() {
-            return Some(metadata.batch_header_hash())
+            return Some(metadata.batch_header_hash());
         }
 
         None
     }
-    
+
     pub fn batch_root(&self) -> Option<&BlobBatchRoot> {
         if let Some(header) = &self.batch_header() {
-            return Some(header.batch_root())
+            return Some(header.batch_root());
         }
 
         None
@@ -172,14 +169,14 @@ impl BlobStatus {
 
     pub fn quorum_numbers(&self) -> Option<&BlobQuorumNumbers> {
         if let Some(header) = &self.batch_header() {
-            return Some(header.quorum_numbers())
+            return Some(header.quorum_numbers());
         }
         None
     }
 
     pub fn quorum_signed_percentages(&self) -> Option<&BlobQuorumSignedPercentages> {
         if let Some(header) = &self.batch_header() {
-            return Some(header.quorum_signed_percentages())
+            return Some(header.quorum_signed_percentages());
         }
 
         None
@@ -187,7 +184,7 @@ impl BlobStatus {
 
     pub fn reference_block_number(&self) -> Option<u128> {
         if let Some(header) = self.batch_header() {
-            return Some(header.reference_block_number())
+            return Some(header.reference_block_number());
         }
         None
     }
@@ -199,17 +196,14 @@ impl From<String> for BlobStatus {
             let json_str = &value[start_index..];
             let blob_status: Result<BlobStatus, serde_json::Error> = serde_json::from_str(json_str);
             match blob_status {
-                Ok(status) => {
-                    return status
-                }
-                Err(_) => {
-                    return BlobStatus::default()
-                }
+                Ok(status) => return status,
+                Err(_) => return BlobStatus::default(),
             }
         } else {
-            return BlobStatus::default()
+            return BlobStatus::default();
         }
-    } }
+    }
+}
 
 impl FromStr for BlobStatus {
     type Err = serde_json::Error;
@@ -222,7 +216,7 @@ impl Default for BlobStatus {
     fn default() -> Self {
         BlobStatus {
             status: Default::default(),
-            info: Default::default()
+            info: Default::default(),
         }
     }
 }
