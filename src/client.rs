@@ -90,7 +90,7 @@ impl EigenDaGrpcClient {
         let payload: String = self.get_payload(encoded_data).into();
 
         let output = grpcurl_command!(
-            &self.grpcurl_bin_path,
+            &self.grpcurl_bin_path.as_ref(),
             "-import-path",
             &self.proto_path,
             "-proto",
@@ -123,7 +123,7 @@ impl EigenDaGrpcClient {
         });
 
         let output = grpcurl_command!(
-            &self.grpcurl_bin_path,
+            &self.grpcurl_bin_path.as_ref(),
             "-import-path",
             &self.proto_path,
             "-proto",
@@ -167,7 +167,7 @@ impl EigenDaGrpcClient {
         });
 
         let output = grpcurl_command!(
-            &self.grpcurl_bin_path,
+            &self.grpcurl_bin_path.as_ref(),
             "-import-path",
             &self.proto_path,
             "-proto",
