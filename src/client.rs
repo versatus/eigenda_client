@@ -31,7 +31,7 @@ impl Default for EigenDaGrpcClient {
         }
         common_path.push(EIGENDA_COMMON_PROTO_FILENAME);
         std::fs::write(
-            eigenda_proto_path.clone(),
+            common_path,
             include_bytes!("../eigenda/api/proto/common/common.proto"),
         )
         .expect("failed to write eigenda common proto api to file.");
@@ -44,14 +44,14 @@ impl Default for EigenDaGrpcClient {
         }
         disperser_path.push(EIGENDA_DISPERSER_PROTO_FILENAME);
         std::fs::write(
-            eigenda_proto_path.clone(),
+            disperser_path.clone(),
             include_bytes!("../eigenda/api/proto/disperser/disperser.proto"),
         )
         .expect("failed to write eigenda disperser proto api to file.");
 
         EigenDaGrpcClientBuilder::default()
             .proto_path(
-                eigenda_proto_path
+                disperser_path
                     .to_str()
                     .expect("failed to convert eigenda proto path to &str")
                     .to_string(),
