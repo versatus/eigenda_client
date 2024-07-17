@@ -14,23 +14,40 @@ pub struct EigenDaGrpcClient {
 }
 
 pub const DEFAULT_EIGENDA_SERVER_ADDRESS: &str = "disperser-holesky.eigenda.xyz:443";
-pub const EIGENDA_PROTO_PATH: &str = "eigenda/api/proto/disperser";
-pub const EIGENDA_PROTO_FILENAME: &str = "disperser.proto";
+pub const EIGENDA_PROTO_PATH: &str = "eigenda/api/proto";
+pub const EIGENDA_COMMON_PROTO_FILENAME: &str = "common.proto";
+pub const EIGENDA_DISPERSER_PROTO_FILENAME: &str = "disperser.proto";
 impl Default for EigenDaGrpcClient {
     fn default() -> Self {
         let mut eigenda_proto_path = std::env::current_dir()
             .expect("failed to get current directory for checking eigenda api path.");
         eigenda_proto_path.push(EIGENDA_PROTO_PATH);
-        if !eigenda_proto_path.exists() {
-            std::fs::create_dir_all(&eigenda_proto_path)
-                .expect("failed to create eigenda proto path.");
+
+        let mut common_path = eigenda_proto_path.clone();
+        common_path.push("common");
+        if !common_path.exists() {
+            std::fs::create_dir_all(&common_path)
+                .expect("failed to create eigenda common proto path.");
         }
-        eigenda_proto_path.push(EIGENDA_PROTO_FILENAME);
+        common_path.push(EIGENDA_COMMON_PROTO_FILENAME);
+        std::fs::write(
+            eigenda_proto_path.clone(),
+            include_bytes!("../eigenda/api/proto/common/common.proto"),
+        )
+        .expect("failed to write eigenda common proto api to file.");
+
+        let mut disperser_path = eigenda_proto_path;
+        disperser_path.push("disperser");
+        if !disperser_path.exists() {
+            std::fs::create_dir_all(&disperser_path)
+                .expect("failed to create eigenda disperser proto path.");
+        }
+        disperser_path.push(EIGENDA_DISPERSER_PROTO_FILENAME);
         std::fs::write(
             eigenda_proto_path.clone(),
             include_bytes!("../eigenda/api/proto/disperser/disperser.proto"),
         )
-        .expect("failed to write eigenda proto api to file.");
+        .expect("failed to write eigenda disperser proto api to file.");
 
         EigenDaGrpcClientBuilder::default()
             .proto_path(
