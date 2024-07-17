@@ -77,8 +77,8 @@ impl EigenDaGrpcClient {
         self.server_address = address;
     }
 
-    pub fn update_grpcurl_bin_path(&mut self, path: String) {
-        self.grpcurl_bin_path = Some(path);
+    pub fn update_grpcurl_bin_path(&mut self, path: Option<String>) {
+        self.grpcurl_bin_path = path;
     }
 
     fn get_payload(&self, encoded_data: String) -> EigenDaBlobPayload {
