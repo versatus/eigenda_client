@@ -13,7 +13,44 @@ pub struct EigenDaGrpcClient {
     server_address: String,
 }
 
+pub const DEFAULT_EIGENDA_SERVER_ADDRESS: &str = "disperser-holesky.eigenda.xyz:443";
+pub const EIGENDA_PROTO_PATH: &str = "eigenda/api/proto/disperser";
+pub const EIGENDA_PROTO_FILENAME: &str = "disperser.proto";
+impl Default for EigenDaGrpcClient {
+    fn default() -> Self {
+        let mut eigenda_proto_path = std::env::current_dir()
+            .expect("failed to get current directory for checking eigenda api path.");
+        eigenda_proto_path.push(EIGENDA_PROTO_PATH);
+        if !eigenda_proto_path.exists() {
+            std::fs::create_dir_all(&eigenda_proto_path)
+                .expect("failed to create eigenda proto path.");
+        }
+        eigenda_proto_path.push(EIGENDA_PROTO_FILENAME);
+        std::fs::write(
+            eigenda_proto_path.clone(),
+            include_bytes!("../eigenda/api/proto/disperser/disperser.proto"),
+        )
+        .expect("failed to write eigenda proto api to file.");
+
+        EigenDaGrpcClientBuilder::default()
+            .proto_path(
+                eigenda_proto_path
+                    .to_str()
+                    .expect("failed to convert eigenda proto path to &str")
+                    .to_string(),
+            )
+            .server_address(DEFAULT_EIGENDA_SERVER_ADDRESS.to_string())
+            .build()
+            .expect("failed to build eigenda gRPC client.")
+    }
+}
+
 impl EigenDaGrpcClient {
+    /// Update the EigenDA server address with some URL address other than [`DEFAULT_EIGENDA_SERVER_ADDRESS`].
+    pub fn update_server_address(&mut self, address: String) {
+        self.server_address = address;
+    }
+
     fn get_payload(&self, encoded_data: String) -> EigenDaBlobPayload {
         EigenDaBlobPayload::new(encoded_data)
     }
