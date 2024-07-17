@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! grpcurl_command {
-    ($($arg:expr),*) => {{
-        let mut command = std::process::Command::new("grpcurl");
+    ($bin_path:expr, $($arg:expr),*) => {{
+        let mut command = std::process::Command::new($bin_path.unwrap_or("grpcurl".to_string()));
         $(command.arg($arg);)*
         match command.output() {
             Ok(o) => Ok(o),

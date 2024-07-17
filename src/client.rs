@@ -9,6 +9,7 @@ use std::str::FromStr;
 
 #[derive(Builder, Clone, Debug)]
 pub struct EigenDaGrpcClient {
+    grpcurl_bin_path: Option<String>,
     proto_path: String,
     disperser_path: String,
     server_address: String,
@@ -51,6 +52,7 @@ impl Default for EigenDaGrpcClient {
         .expect("failed to write eigenda disperser proto api to file.");
 
         EigenDaGrpcClientBuilder::default()
+            .grpcurl_bin_path(None)
             .proto_path(
                 eigenda_proto_path
                     .to_str()
@@ -75,6 +77,10 @@ impl EigenDaGrpcClient {
         self.server_address = address;
     }
 
+    pub fn update_grpcurl_bin_path(&mut self, path: String) {
+        self.grpcurl_bin_path = Some(path);
+    }
+
     fn get_payload(&self, encoded_data: String) -> EigenDaBlobPayload {
         EigenDaBlobPayload::new(encoded_data)
     }
@@ -84,6 +90,7 @@ impl EigenDaGrpcClient {
         let payload: String = self.get_payload(encoded_data).into();
 
         let output = grpcurl_command!(
+            &self.grpcurl_bin_path,
             "-import-path",
             &self.proto_path,
             "-proto",
@@ -116,6 +123,7 @@ impl EigenDaGrpcClient {
         });
 
         let output = grpcurl_command!(
+            &self.grpcurl_bin_path,
             "-import-path",
             &self.proto_path,
             "-proto",
@@ -159,6 +167,7 @@ impl EigenDaGrpcClient {
         });
 
         let output = grpcurl_command!(
+            &self.grpcurl_bin_path,
             "-import-path",
             &self.proto_path,
             "-proto",
