@@ -45,7 +45,7 @@ mod tests {
     use std::time::Duration;
 
     #[test]
-    #[ignore = "was failing to compile, now fails to find some directory it expects."]
+    #[ignore = "encountered an error to convert a 32-bytes into a valid field element, please use the correct format where every 32bytes(big-endian) is less than 21888242871839275222246405745257275088548364400416034343698204186575808495617"]
     fn test_disperse_get_status_and_retrieve_blob() {
         let client = create_client();
         let arbitrary_data = base64::encode("ArbitraryData");

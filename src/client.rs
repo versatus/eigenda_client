@@ -10,6 +10,7 @@ use std::str::FromStr;
 #[derive(Builder, Clone, Debug)]
 pub struct EigenDaGrpcClient {
     proto_path: String,
+    disperser_path: String,
     server_address: String,
 }
 
@@ -31,12 +32,12 @@ impl Default for EigenDaGrpcClient {
         }
         common_path.push(EIGENDA_COMMON_PROTO_FILENAME);
         std::fs::write(
-            common_path,
+            &common_path,
             include_bytes!("../eigenda/api/proto/common/common.proto"),
         )
         .expect("failed to write eigenda common proto api to file.");
 
-        let mut disperser_path = eigenda_proto_path;
+        let mut disperser_path = eigenda_proto_path.clone();
         disperser_path.push("disperser");
         if !disperser_path.exists() {
             std::fs::create_dir_all(&disperser_path)
@@ -44,16 +45,22 @@ impl Default for EigenDaGrpcClient {
         }
         disperser_path.push(EIGENDA_DISPERSER_PROTO_FILENAME);
         std::fs::write(
-            disperser_path.clone(),
+            &disperser_path,
             include_bytes!("../eigenda/api/proto/disperser/disperser.proto"),
         )
         .expect("failed to write eigenda disperser proto api to file.");
 
         EigenDaGrpcClientBuilder::default()
             .proto_path(
-                disperser_path
+                eigenda_proto_path
                     .to_str()
                     .expect("failed to convert eigenda proto path to &str")
+                    .to_string(),
+            )
+            .disperser_path(
+                disperser_path
+                    .to_str()
+                    .expect("failed to convert eigenda disperser proto path to &str")
                     .to_string(),
             )
             .server_address(DEFAULT_EIGENDA_SERVER_ADDRESS.to_string())
@@ -77,8 +84,10 @@ impl EigenDaGrpcClient {
         let payload: String = self.get_payload(encoded_data).into();
 
         let output = grpcurl_command!(
-            "-proto",
+            "-import-path",
             &self.proto_path,
+            "-proto",
+            &self.disperser_path,
             "-d",
             &payload,
             &self.server_address,
@@ -107,8 +116,10 @@ impl EigenDaGrpcClient {
         });
 
         let output = grpcurl_command!(
-            "-proto",
+            "-import-path",
             &self.proto_path,
+            "-proto",
+            &self.disperser_path,
             "-d",
             &payload.to_string(),
             &self.server_address,
@@ -148,8 +159,10 @@ impl EigenDaGrpcClient {
         });
 
         let output = grpcurl_command!(
-            "-proto",
+            "-import-path",
             &self.proto_path,
+            "-proto",
+            &self.disperser_path,
             "-d",
             &payload.to_string(),
             &self.server_address,
